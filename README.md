@@ -16,17 +16,10 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-- [What is Spilltea?](#what-is-settuings)
-- [Legal Disclaimer](#legal-disclaimer)
+- [What is SetTUIngs?](#what-is-settuings)
 - [Features](#features)
 - [Installation](#installation)
-- [Project Management](#project-management)
-- [Configuration](#configuration)
-  - [Per-project configuration](#per-project-configuration)
 - [CLI Flags](#cli-flags)
-- [Plugin System](#plugin-system)
-- [Vim / Neovim Integration](#vim--neovim-integration)
-- [Deployment](#deployment)
 - [Tech Stack](#tech-stack)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -87,27 +80,19 @@ environment.systemPackages = [ inputs.settuings.packages.${pkgs.system}.default 
 ## CLI Flags
 
 <!-- exec: echo '```' && go run ./cmd/settuings -h && echo '```' -->
-
 ```
-A minimal, terminal-based HTTP(S) proxy for pentesters and CTF players.
+A TUI to manage your Linux system settings like wifi, bluetooth, and more, without leaving the terminal.
 
 Usage:
-  spilltea [flags]
+  settuings [flags]
 
 Flags:
-      --add-default-config      copy the default config file to the config path and exit
-      --add-default-plugins     copy built-in example plugins into the plugins dir and exit
-  -c, --config string           path to config file
-  -h, --help                    help for spilltea
-      --host string             proxy host (overrides config)
-      --plugins-dir string      path to plugins dir (overrides config)
-  -p, --port int                proxy port (overrides config)
-  -P, --project string          project name to open directly, or "tmp" for a temporary session
-      --ssl-insecure            skip TLS certificate verification (overrides config)
-      --upstream-proxy string   upstream proxy URL, e.g. http://user:pass@host:8888 (overrides config)
-  -v, --version                 version for spilltea
+      --add-default-config   copy the default config file to the config path and exit
+  -c, --config string        path to config file
+  -h, --help                 help for settuings
+  -p, --page string          page to open at launch (About, Network, Bluetooth, Audio)
+  -v, --version              version for settuings
 ```
-
 <!-- endexec -->
 
 ## Tech Stack
