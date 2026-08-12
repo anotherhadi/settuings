@@ -1,0 +1,56 @@
+app:
+  external_editor: "" # override $EDITOR for external editing (e.g. nvim, code --wait)
+
+tui:
+  use_nerdfont_icons: true
+  default_sidebar_state: "expanded" # hidden, collapsed, expanded
+
+keybindings:
+  global:
+    quit: "q,ctrl+c"
+    escape: "esc,ctrl+c"
+    help: "?"
+    open_logs: "ctrl+g"
+    toggle_sidebar: "ctrl+b"
+    cycle_focus: "tab"
+    up: "up,k"
+    down: "down,j"
+    left: "left,h"
+    right: "right,l"
+    goto_top: "g"
+    goto_bottom: "G,end"
+    scroll_up: "pgup,ctrl+u"
+    scroll_down: "pgdown,ctrl+d"
+    prev_page: "[,ctrl+i"
+    next_page: "],ctrl+o"
+
+  docs:
+    search: "/"
+    search_reset: "r"
+    search_next: "n"
+    search_prev: "N"
+
+  network:
+    select: "enter"
+    refresh: "r"
+    forget: "d"
+    toggle_auto: "a"
+    reveal_secret: "p"
+    known: "K"
+    info: "i"
+    disconnect: "d"
+    toggle_radio: "w"
+
+  bluetooth:
+    select: "enter"
+    refresh: "r"
+    forget: "d"
+    toggle_trust: "t"
+    info: "i"
+    toggle_power: "w"
+
+  audio:
+    select: "enter"
+    refresh: "r"
+    mute: "m"
+    test: "t"

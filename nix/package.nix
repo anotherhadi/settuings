@@ -1,0 +1,29 @@
+{
+  pkgs,
+  buildGoApplication,
+}: let
+  pname = "settuings";
+  version = "0.0.1";
+  ldflags = ["-s" "-w" "-X main.version=${version}"];
+  pkg = buildGoApplication {
+    inherit pname version ldflags;
+    src = ../.;
+    modules = ./gomod2nix.toml;
+    nativeBuildInputs = [pkgs.installShellFiles];
+    env.GOTOOLCHAIN = "local";
+    postInstall = ''
+      installShellCompletion --cmd settuings \
+        --bash <($out/bin/settuings completion bash) \
+        --zsh <($out/bin/settuings completion zsh) \
+        --fish <($out/bin/settuings completion fish)
+    '';
+    meta = with pkgs.lib; {
+      description = "A TUI to manage your Linux system settings like wifi, bluetooth, and more, without leaving the terminal.";
+      homepage = "https://github.com/anotherhadi/settuings";
+      platforms = platforms.unix;
+    };
+  };
+in {
+  "${pname}" = pkg;
+  default = pkg;
+}
