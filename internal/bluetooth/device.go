@@ -185,10 +185,13 @@ func Scan(seconds int) error {
 	return err
 }
 
-// Pair initiates pairing with a device. Because non-interactive
-// bluetoothctl has no agent to answer PIN/confirmation prompts, this only
-// succeeds for "just works" devices (most mice, keyboards, headsets).
+// Pair initiates pairing with a device, first registering settuings as
+// BlueZ's default agent so devices that need PIN/passkey confirmation
+// (not just "just works" ones) can complete pairing.
 func Pair(address string) error {
+	if err := ensureAgent(); err != nil {
+		return err
+	}
 	_, err := run(actionTimeout, "pair", address)
 	return err
 }

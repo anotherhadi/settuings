@@ -9,6 +9,7 @@ require (
 	charm.land/lipgloss/v2 v2.0.3
 	github.com/anotherhadi/ilovetui v0.1.6
 	github.com/charmbracelet/x/ansi v0.11.7
+	github.com/godbus/dbus/v5 v5.2.2
 	github.com/sirupsen/logrus v1.9.4
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
