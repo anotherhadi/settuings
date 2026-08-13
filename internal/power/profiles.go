@@ -36,6 +36,14 @@ func CheckAvailable() error {
 	return err
 }
 
+// Installed reports whether powerprofilesctl is present in PATH, without
+// probing power-profiles-daemon. Cheap enough to call when deciding whether
+// to show the Power page in the sidebar.
+func Installed() bool {
+	_, err := exec.LookPath("powerprofilesctl")
+	return err == nil
+}
+
 // ListProfiles returns the available profiles in the order reported by
 // powerprofilesctl, each flagged with whether it's currently active.
 func ListProfiles() ([]Profile, error) {

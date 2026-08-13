@@ -22,6 +22,14 @@ func CheckAvailable() error {
 	return err
 }
 
+// Installed reports whether hyprctl is present in PATH, without probing
+// Hyprland. Cheap enough to call when deciding whether to show the Inputs
+// page in the sidebar.
+func Installed() bool {
+	_, err := exec.LookPath("hyprctl")
+	return err == nil
+}
+
 func Reset() error {
 	_, err := run("reload")
 	return err

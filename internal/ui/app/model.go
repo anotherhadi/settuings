@@ -20,10 +20,9 @@ import (
 )
 
 // buildPageShortcuts numbers the visible pages 1..N in sidebar order, so
-// hiding a page never leaves a gap in the shortcuts. It must run after
-// config.Load, hence a function called from New rather than a package var.
-func buildPageShortcuts() map[string]page {
-	visible := visiblePages()
+// hiding a page (or a missing CLI tool) never leaves a gap in the
+// shortcuts.
+func buildPageShortcuts(visible []pageEntry) map[string]page {
 	m := make(map[string]page, len(visible))
 	for i, e := range visible {
 		m[strconv.Itoa(i+1)] = e.id
@@ -34,6 +33,7 @@ func buildPageShortcuts() map[string]page {
 type Model struct {
 	page          page
 	pageShortcuts map[string]page
+	visiblePages  []pageEntry
 	logPath       string
 	fatalErr      error
 	logFileErr    error
@@ -67,10 +67,12 @@ func New(initialPage string) (Model, error) {
 	}
 
 	cfg := config.Global
+	visible := visiblePages()
 
 	m := Model{
 		page:          startPage,
-		pageShortcuts: buildPageShortcuts(),
+		pageShortcuts: buildPageShortcuts(visible),
+		visiblePages:  visible,
 		about:         aboutUI.New(),
 		network:       networkUI.New(),
 		bluetooth:     bluetoothUI.New(),

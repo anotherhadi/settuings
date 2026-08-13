@@ -4,8 +4,13 @@ import (
 	"strings"
 
 	tea "charm.land/bubbletea/v2"
+	"github.com/anotherhadi/settuings/internal/audio"
+	"github.com/anotherhadi/settuings/internal/bluetooth"
 	"github.com/anotherhadi/settuings/internal/config"
 	"github.com/anotherhadi/settuings/internal/icons"
+	"github.com/anotherhadi/settuings/internal/input"
+	"github.com/anotherhadi/settuings/internal/network"
+	"github.com/anotherhadi/settuings/internal/power"
 	aboutUI "github.com/anotherhadi/settuings/internal/ui/about"
 	audioUI "github.com/anotherhadi/settuings/internal/ui/audio"
 	bluetoothUI "github.com/anotherhadi/settuings/internal/ui/bluetooth"
@@ -29,6 +34,12 @@ const (
 type pageEntry struct {
 	id   page
 	icon func() string
+
+	// available reports whether this page's underlying CLI tool is
+	// installed. nil = always available (e.g. About has no dependency).
+	// A page that isn't available is left out of the sidebar and its
+	// numbered shortcuts, but stays reachable via --page.
+	available func() bool
 
 	// render returns the page's view content. nil = show "empty".
 	render func(m *Model) string
@@ -66,8 +77,9 @@ var pageRegistry = []pageEntry{
 		resize:    func(m *Model, w, h int) { m.about.SetSize(w, h) },
 	},
 	{
-		id:   pageNetwork,
-		icon: func() string { return icons.I.Network },
+		id:        pageNetwork,
+		icon:      func() string { return icons.I.Network },
+		available: network.Installed,
 
 		render: func(m *Model) string { return m.network.View().Content },
 		update: func(m *Model, msg tea.Msg) tea.Cmd {
@@ -80,8 +92,9 @@ var pageRegistry = []pageEntry{
 		activate:  func(m *Model) tea.Cmd { return m.network.Activate() },
 	},
 	{
-		id:   pageBluetooth,
-		icon: func() string { return icons.I.Bluetooth },
+		id:        pageBluetooth,
+		icon:      func() string { return icons.I.Bluetooth },
+		available: bluetooth.Installed,
 
 		render: func(m *Model) string { return m.bluetooth.View().Content },
 		update: func(m *Model, msg tea.Msg) tea.Cmd {
@@ -94,8 +107,9 @@ var pageRegistry = []pageEntry{
 		activate:  func(m *Model) tea.Cmd { return m.bluetooth.Activate() },
 	},
 	{
-		id:   pageAudio,
-		icon: func() string { return icons.I.Audio },
+		id:        pageAudio,
+		icon:      func() string { return icons.I.Audio },
+		available: audio.Installed,
 
 		render: func(m *Model) string { return m.audio.View().Content },
 		update: func(m *Model, msg tea.Msg) tea.Cmd {
@@ -109,8 +123,9 @@ var pageRegistry = []pageEntry{
 		deactivate: func(m *Model) { m.audio.Deactivate() },
 	},
 	{
-		id:   pagePower,
-		icon: func() string { return icons.I.Power },
+		id:        pagePower,
+		icon:      func() string { return icons.I.Power },
+		available: power.Installed,
 
 		render: func(m *Model) string { return m.power.View().Content },
 		update: func(m *Model, msg tea.Msg) tea.Cmd {
@@ -123,8 +138,9 @@ var pageRegistry = []pageEntry{
 		activate:  func(m *Model) tea.Cmd { return m.power.Activate() },
 	},
 	{
-		id:   pageInputs,
-		icon: func() string { return icons.I.Inputs },
+		id:        pageInputs,
+		icon:      func() string { return icons.I.Inputs },
+		available: input.Installed,
 
 		render: func(m *Model) string { return m.input.View().Content },
 		update: func(m *Model, msg tea.Msg) tea.Cmd {
@@ -160,30 +176,30 @@ func lookupPage(name string) (page, bool) {
 }
 
 // visiblePages returns pageRegistry entries not listed in the user's
-// tui.hidden_pages config, preserving registry order. A page hidden this
-// way is still reachable via --page: hiding only affects the sidebar and
-// its numbered shortcuts.
+// tui.hidden_pages config and whose underlying CLI tool (if any) is
+// installed, preserving registry order. A page left out this way is still
+// reachable via --page: this only affects the sidebar and its numbered
+// shortcuts. It shells out to `exec.LookPath` per page, so callers should
+// compute it once (e.g. in New) and cache the result rather than calling it
+// on every render.
 func visiblePages() []pageEntry {
 	hiddenNames := config.Global.TUI.HiddenPages
-	if len(hiddenNames) == 0 {
-		return pageRegistry
-	}
-
 	hidden := make(map[page]bool, len(hiddenNames))
 	for _, name := range hiddenNames {
 		if p, ok := lookupPage(name); ok {
 			hidden[p] = true
 		}
 	}
-	if len(hidden) == 0 {
-		return pageRegistry
-	}
 
 	visible := make([]pageEntry, 0, len(pageRegistry))
 	for _, e := range pageRegistry {
-		if !hidden[e.id] {
-			visible = append(visible, e)
+		if hidden[e.id] {
+			continue
 		}
+		if e.available != nil && !e.available() {
+			continue
+		}
+		visible = append(visible, e)
 	}
 	return visible
 }

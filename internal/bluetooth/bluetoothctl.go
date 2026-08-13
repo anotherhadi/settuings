@@ -39,6 +39,14 @@ func CheckAvailable() error {
 	return nil
 }
 
+// Installed reports whether bluetoothctl is present in PATH, without
+// probing for a controller. Cheap enough to call when deciding whether to
+// show the Bluetooth page in the sidebar.
+func Installed() bool {
+	_, err := exec.LookPath("bluetoothctl")
+	return err == nil
+}
+
 // run executes bluetoothctl in single-command (non-interactive) mode.
 // bluetoothctl writes both normal output and error messages to stdout
 // (colored with ANSI escapes), so errors are extracted from there rather

@@ -36,6 +36,14 @@ func CheckAvailable() error {
 	return nil
 }
 
+// Installed reports whether nmcli is present in PATH, without probing
+// NetworkManager. Cheap enough to call when deciding whether to show the
+// Network page in the sidebar.
+func Installed() bool {
+	_, err := exec.LookPath("nmcli")
+	return err == nil
+}
+
 func run(args ...string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 	defer cancel()

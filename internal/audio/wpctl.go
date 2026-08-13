@@ -31,6 +31,14 @@ func CheckAvailable() error {
 	return nil
 }
 
+// Installed reports whether wpctl is present in PATH, without probing
+// PipeWire. Cheap enough to call when deciding whether to show the Audio
+// page in the sidebar.
+func Installed() bool {
+	_, err := exec.LookPath("wpctl")
+	return err == nil
+}
+
 func run(args ...string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 	defer cancel()
