@@ -5,7 +5,9 @@ package input
 
 import (
 	"charm.land/bubbles/v2/help"
+	"charm.land/bubbles/v2/textinput"
 	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
 	ilovetui "github.com/anotherhadi/ilovetui"
 )
 
@@ -33,6 +35,8 @@ type Model struct {
 	cursorInit     bool // whether cursor has been snapped to the current layout yet
 	layoutPending  bool
 	layoutFeedback string
+	filterInput    textinput.Model
+	filtering      bool
 
 	sensitivityErr   error
 	sensitivity      float64
@@ -42,7 +46,16 @@ type Model struct {
 }
 
 func New() Model {
-	return Model{help: ilovetui.NewHelp()}
+	ti := textinput.New()
+	ti.Prompt = "/"
+	s := ti.Styles()
+	s.Focused.Prompt = lipgloss.NewStyle().Foreground(ilovetui.S.Primary)
+	ti.SetStyles(s)
+
+	return Model{
+		help:        ilovetui.NewHelp(),
+		filterInput: ti,
+	}
 }
 
 func (m Model) Init() tea.Cmd {
@@ -57,11 +70,12 @@ func (m *Model) Activate() tea.Cmd {
 }
 
 func (m Model) IsEditing() bool {
-	return false
+	return m.filtering
 }
 
 func (m *Model) SetSize(w, h int) {
 	m.width = w
 	m.height = h
 	m.help.SetWidth(w - 2)
+	m.filterInput.SetWidth(w - 4)
 }

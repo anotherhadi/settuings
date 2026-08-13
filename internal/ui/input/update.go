@@ -43,6 +43,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.handleReset(msg)
 
 	case tea.KeyPressMsg:
+		if m.filtering {
+			// Every key goes straight to the filter box while typing (a
+			// query like "tab" or "r" must not also trigger CycleFocus or
+			// Reset), same precedence the About page's search box uses.
+			return m, m.updateLayout(msg)
+		}
+
 		if key.Matches(msg, keys.Keys.Global.Help) {
 			m.help.ShowAll = !m.help.ShowAll
 			return m, nil

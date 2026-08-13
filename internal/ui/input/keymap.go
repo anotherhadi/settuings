@@ -24,18 +24,29 @@ func (k inputKeyMap) ShortHelp() []key.Binding {
 	if k.m.checkErr != nil {
 		return []key.Binding{g.Help}
 	}
+	if k.m.filtering {
+		confirm := relabel(in.Select, "confirm")
+		cancel := relabel(g.Escape, "cancel")
+		return []key.Binding{confirm, cancel}
+	}
 	switch k.m.focus {
 	case focusMouse:
 		speedDown, speedUp := relabel(g.Left, "speed down"), relabel(g.Right, "speed up")
 		return []key.Binding{speedDown, speedUp, in.Reset, g.CycleFocus, g.Help}
 	default:
-		return []key.Binding{g.Up, g.Down, in.Select, in.Reset, g.CycleFocus, g.Help}
+		return []key.Binding{g.Up, g.Down, in.Select, in.Filter, in.Reset, g.CycleFocus, g.Help}
 	}
 }
 
 func (k inputKeyMap) FullHelp() [][]key.Binding {
 	g := keys.Keys.Global
 	in := keys.Keys.Input
+
+	if k.m.filtering {
+		confirm := relabel(in.Select, "confirm filter")
+		cancel := relabel(g.Escape, "cancel filter")
+		return keys.ChunkByWidth([]key.Binding{confirm, cancel}, k.width)
+	}
 
 	var bindings []key.Binding
 	switch {
@@ -45,7 +56,7 @@ func (k inputKeyMap) FullHelp() [][]key.Binding {
 		speedDown, speedUp := relabel(g.Left, "speed down"), relabel(g.Right, "speed up")
 		bindings = []key.Binding{speedDown, speedUp, in.Reset, g.CycleFocus}
 	default:
-		bindings = []key.Binding{g.Up, g.Down, in.Select, in.Reset, g.CycleFocus}
+		bindings = []key.Binding{g.Up, g.Down, in.Select, in.Filter, in.Reset, g.CycleFocus}
 	}
 	bindings = append(bindings, g.CommonBindings()...)
 	return keys.ChunkByWidth(bindings, k.width)

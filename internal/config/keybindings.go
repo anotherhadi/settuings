@@ -62,6 +62,7 @@ type PowerKeys struct {
 type InputKeys struct {
 	Select string `mapstructure:"select"`
 	Reset  string `mapstructure:"reset"`
+	Filter string `mapstructure:"filter"`
 }
 
 type Keybindings struct {

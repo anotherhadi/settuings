@@ -63,3 +63,4 @@ keybindings:
   input:
     select: "enter"
     reset: "r"
+    filter: "/"
