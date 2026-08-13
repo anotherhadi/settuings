@@ -14,22 +14,28 @@ import (
 	bluetoothUI "github.com/anotherhadi/settuings/internal/ui/bluetooth"
 	notificationsUI "github.com/anotherhadi/settuings/internal/ui/components/notifications"
 	networkUI "github.com/anotherhadi/settuings/internal/ui/network"
+	powerUI "github.com/anotherhadi/settuings/internal/ui/power"
 	"github.com/sirupsen/logrus"
 )
 
-var pageShortcuts = func() map[string]page {
-	m := make(map[string]page, len(pageRegistry))
-	for i, e := range pageRegistry {
+// buildPageShortcuts numbers the visible pages 1..N in sidebar order, so
+// hiding a page never leaves a gap in the shortcuts. It must run after
+// config.Load, hence a function called from New rather than a package var.
+func buildPageShortcuts() map[string]page {
+	visible := visiblePages()
+	m := make(map[string]page, len(visible))
+	for i, e := range visible {
 		m[strconv.Itoa(i+1)] = e.id
 	}
 	return m
-}()
+}
 
 type Model struct {
-	page       page
-	logPath    string
-	fatalErr   error
-	logFileErr error
+	page          page
+	pageShortcuts map[string]page
+	logPath       string
+	fatalErr      error
+	logFileErr    error
 
 	width         int
 	height        int
@@ -38,6 +44,7 @@ type Model struct {
 	network       networkUI.Model
 	bluetooth     bluetoothUI.Model
 	audio         audioUI.Model
+	power         powerUI.Model
 	notifications notificationsUI.Model
 }
 
@@ -61,10 +68,12 @@ func New(initialPage string) (Model, error) {
 
 	m := Model{
 		page:          startPage,
+		pageShortcuts: buildPageShortcuts(),
 		about:         aboutUI.New(),
 		network:       networkUI.New(),
 		bluetooth:     bluetoothUI.New(),
 		audio:         audioUI.New(),
+		power:         powerUI.New(),
 		notifications: notificationsUI.New(),
 		sidebarState:  sidebarState(cfg.TUI.DefaultSidebarState),
 		logPath:       logPath,
@@ -83,7 +92,7 @@ func New(initialPage string) (Model, error) {
 func (m Model) FatalErr() error { return m.fatalErr }
 
 func (m Model) Init() tea.Cmd {
-	cmds := []tea.Cmd{m.about.Init(), m.network.Init(), m.bluetooth.Init(), m.audio.Init()}
+	cmds := []tea.Cmd{m.about.Init(), m.network.Init(), m.bluetooth.Init(), m.audio.Init(), m.power.Init()}
 	if m.page != pageAbout {
 		cmds = append(cmds, m.activatePage(m.page))
 	}

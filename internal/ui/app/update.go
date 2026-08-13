@@ -47,7 +47,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.resizeChildren()
 
 			default:
-				if p, ok := pageShortcuts[msg.String()]; ok {
+				if p, ok := m.pageShortcuts[msg.String()]; ok {
 					prev := m.page
 					m.page = p
 					if prev != p {

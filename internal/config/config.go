@@ -23,8 +23,9 @@ type Config struct {
 	} `mapstructure:"app"`
 
 	TUI struct {
-		UseNerdfontIcons    bool   `mapstructure:"use_nerdfont_icons"`
-		DefaultSidebarState string `mapstructure:"default_sidebar_state"`
+		UseNerdfontIcons    bool     `mapstructure:"use_nerdfont_icons"`
+		DefaultSidebarState string   `mapstructure:"default_sidebar_state"`
+		HiddenPages         []string `mapstructure:"hidden_pages"`
 	} `mapstructure:"tui"`
 
 	Keybindings Keybindings `mapstructure:"keybindings"`

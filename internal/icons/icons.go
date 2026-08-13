@@ -11,6 +11,7 @@ type Icons struct {
 	Network   string
 	Bluetooth string
 	Audio     string
+	Power     string
 
 	Wifi     string
 	Ethernet string
@@ -18,9 +19,10 @@ type Icons struct {
 	Check    string
 	Lock     string
 
-	Output string
-	Input  string
-	Apps   string
+	Output  string
+	Input   string
+	Apps    string
+	Battery string
 }
 
 var I *Icons
@@ -36,6 +38,7 @@ func Init(cfg *config.Config) {
 			Network:   "󰛳 ",
 			Bluetooth: "󰂯 ",
 			Audio:     "󰓃 ",
+			Power:     "󰐥 ",
 
 			Wifi:     "󰤨 ",
 			Ethernet: "󰈀 ",
@@ -43,9 +46,10 @@ func Init(cfg *config.Config) {
 			Check:    "󰄬 ",
 			Lock:     "󰌾 ",
 
-			Output: "󰕾 ",
-			Input:  "󰍬 ",
-			Apps:   "󰀻 ",
+			Output:  "󰕾 ",
+			Input:   "󰍬 ",
+			Apps:    "󰀻 ",
+			Battery: "󰁹 ",
 		}
 	} else {
 		I = &Icons{}

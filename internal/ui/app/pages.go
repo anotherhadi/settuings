@@ -4,11 +4,13 @@ import (
 	"strings"
 
 	tea "charm.land/bubbletea/v2"
+	"github.com/anotherhadi/settuings/internal/config"
 	"github.com/anotherhadi/settuings/internal/icons"
 	aboutUI "github.com/anotherhadi/settuings/internal/ui/about"
 	audioUI "github.com/anotherhadi/settuings/internal/ui/audio"
 	bluetoothUI "github.com/anotherhadi/settuings/internal/ui/bluetooth"
 	networkUI "github.com/anotherhadi/settuings/internal/ui/network"
+	powerUI "github.com/anotherhadi/settuings/internal/ui/power"
 )
 
 type page string
@@ -18,6 +20,7 @@ const (
 	pageNetwork   page = "Network"
 	pageBluetooth page = "Bluetooth"
 	pageAudio     page = "Audio"
+	pagePower     page = "Power"
 )
 
 // pageEntry describes a page and all its integration hooks.
@@ -103,6 +106,20 @@ var pageRegistry = []pageEntry{
 		activate:   func(m *Model) tea.Cmd { return m.audio.Activate() },
 		deactivate: func(m *Model) { m.audio.Deactivate() },
 	},
+	{
+		id:   pagePower,
+		icon: func() string { return icons.I.Power },
+
+		render: func(m *Model) string { return m.power.View().Content },
+		update: func(m *Model, msg tea.Msg) tea.Cmd {
+			updated, cmd := m.power.Update(msg)
+			m.power = updated.(powerUI.Model)
+			return cmd
+		},
+		isEditing: func(m *Model) bool { return m.power.IsEditing() },
+		resize:    func(m *Model, w, h int) { m.power.SetSize(w, h) },
+		activate:  func(m *Model) tea.Cmd { return m.power.Activate() },
+	},
 }
 
 // PageNames returns the valid page identifiers, in sidebar order, usable
@@ -124,4 +141,33 @@ func lookupPage(name string) (page, bool) {
 		}
 	}
 	return "", false
+}
+
+// visiblePages returns pageRegistry entries not listed in the user's
+// tui.hidden_pages config, preserving registry order. A page hidden this
+// way is still reachable via --page: hiding only affects the sidebar and
+// its numbered shortcuts.
+func visiblePages() []pageEntry {
+	hiddenNames := config.Global.TUI.HiddenPages
+	if len(hiddenNames) == 0 {
+		return pageRegistry
+	}
+
+	hidden := make(map[page]bool, len(hiddenNames))
+	for _, name := range hiddenNames {
+		if p, ok := lookupPage(name); ok {
+			hidden[p] = true
+		}
+	}
+	if len(hidden) == 0 {
+		return pageRegistry
+	}
+
+	visible := make([]pageEntry, 0, len(pageRegistry))
+	for _, e := range pageRegistry {
+		if !hidden[e.id] {
+			visible = append(visible, e)
+		}
+	}
+	return visible
 }

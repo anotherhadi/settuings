@@ -4,6 +4,7 @@ app:
 tui:
   use_nerdfont_icons: true
   default_sidebar_state: "expanded" # hidden, collapsed, expanded
+  hidden_pages: [] # page names to hide from the sidebar, e.g. ["Audio", "Power"]
 
 keybindings:
   global:
@@ -54,3 +55,7 @@ keybindings:
     refresh: "r"
     mute: "m"
     test: "t"
+
+  power:
+    select: "enter"
+    refresh: "r"

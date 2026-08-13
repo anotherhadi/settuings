@@ -54,10 +54,16 @@ type AudioKeys struct {
 	Test    string `mapstructure:"test"`
 }
 
+type PowerKeys struct {
+	Select  string `mapstructure:"select"`
+	Refresh string `mapstructure:"refresh"`
+}
+
 type Keybindings struct {
 	Global    GlobalKeys    `mapstructure:"global"`
 	Docs      DocsKeys      `mapstructure:"docs"`
 	Network   NetworkKeys   `mapstructure:"network"`
 	Bluetooth BluetoothKeys `mapstructure:"bluetooth"`
 	Audio     AudioKeys     `mapstructure:"audio"`
+	Power     PowerKeys     `mapstructure:"power"`
 }

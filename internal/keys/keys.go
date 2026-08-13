@@ -13,6 +13,7 @@ type KeyMap struct {
 	Network   NetworkKeyMap
 	Bluetooth BluetoothKeyMap
 	Audio     AudioKeyMap
+	Power     PowerKeyMap
 }
 
 var Keys *KeyMap
@@ -25,6 +26,7 @@ func Init(cfg *config.Config) {
 		Network:   newNetworkKeyMap(kb.Network),
 		Bluetooth: newBluetoothKeyMap(kb.Bluetooth),
 		Audio:     newAudioKeyMap(kb.Audio),
+		Power:     newPowerKeyMap(kb.Power),
 	}
 }
 
