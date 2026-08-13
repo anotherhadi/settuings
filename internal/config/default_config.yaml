@@ -59,3 +59,7 @@ keybindings:
   power:
     select: "enter"
     refresh: "r"
+
+  input:
+    select: "enter"
+    reset: "r"

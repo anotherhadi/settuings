@@ -12,6 +12,7 @@ type Icons struct {
 	Bluetooth string
 	Audio     string
 	Power     string
+	Inputs    string
 
 	Wifi     string
 	Ethernet string
@@ -39,6 +40,7 @@ func Init(cfg *config.Config) {
 			Bluetooth: "󰂯 ",
 			Audio:     "󰓃 ",
 			Power:     "󰐥 ",
+			Inputs:    "󰌌 ",
 
 			Wifi:     "󰤨 ",
 			Ethernet: "󰈀 ",

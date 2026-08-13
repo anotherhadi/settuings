@@ -59,6 +59,11 @@ type PowerKeys struct {
 	Refresh string `mapstructure:"refresh"`
 }
 
+type InputKeys struct {
+	Select string `mapstructure:"select"`
+	Reset  string `mapstructure:"reset"`
+}
+
 type Keybindings struct {
 	Global    GlobalKeys    `mapstructure:"global"`
 	Docs      DocsKeys      `mapstructure:"docs"`
@@ -66,4 +71,5 @@ type Keybindings struct {
 	Bluetooth BluetoothKeys `mapstructure:"bluetooth"`
 	Audio     AudioKeys     `mapstructure:"audio"`
 	Power     PowerKeys     `mapstructure:"power"`
+	Input     InputKeys     `mapstructure:"input"`
 }

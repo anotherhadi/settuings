@@ -37,6 +37,7 @@ SetTUIngs is a keyboard-driven TUI for the everyday Linux system settings you'd 
 - **Bluetooth**: Discover, pair, connect, trust, and forget devices, and power the adapter on/off.
 - **Audio**: Adjust output/input volume, mute, and pick the default speaker or mic; preview a device with a test tone or a live input-level meter; control the volume of individual apps (browser tab, Spotify, etc.) independently.
 - **Power**: Switch power profiles (performance, balanced, power-saver) and check battery charge, health, and time remaining at a glance.
+- **Inputs**: Change the keyboard layout and adjust mouse pointer speed, via `hyprctl` (Hyprland only).
 - **Vim-like Navigation**: The entire interface is keyboard-driven with Vim-inspired shortcuts. Use `h/j/k/l` to move, `gg`/`G` to jump to the top/bottom, `/` to search, `q` to close panels, and more. All keybindings are fully customizable via the config file.
 
 ## Installation
@@ -91,7 +92,7 @@ Flags:
       --add-default-config   copy the default config file to the config path and exit
   -c, --config string        path to config file
   -h, --help                 help for settuings
-  -p, --page string          page to open at launch (About, Network, Bluetooth, Audio, Power)
+  -p, --page string          page to open at launch (About, Network, Bluetooth, Audio, Power, Inputs)
   -v, --version              version for settuings
 ```
 <!-- endexec -->

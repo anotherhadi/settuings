@@ -9,6 +9,7 @@ import (
 	aboutUI "github.com/anotherhadi/settuings/internal/ui/about"
 	audioUI "github.com/anotherhadi/settuings/internal/ui/audio"
 	bluetoothUI "github.com/anotherhadi/settuings/internal/ui/bluetooth"
+	inputUI "github.com/anotherhadi/settuings/internal/ui/input"
 	networkUI "github.com/anotherhadi/settuings/internal/ui/network"
 	powerUI "github.com/anotherhadi/settuings/internal/ui/power"
 )
@@ -21,6 +22,7 @@ const (
 	pageBluetooth page = "Bluetooth"
 	pageAudio     page = "Audio"
 	pagePower     page = "Power"
+	pageInputs    page = "Inputs"
 )
 
 // pageEntry describes a page and all its integration hooks.
@@ -119,6 +121,20 @@ var pageRegistry = []pageEntry{
 		isEditing: func(m *Model) bool { return m.power.IsEditing() },
 		resize:    func(m *Model, w, h int) { m.power.SetSize(w, h) },
 		activate:  func(m *Model) tea.Cmd { return m.power.Activate() },
+	},
+	{
+		id:   pageInputs,
+		icon: func() string { return icons.I.Inputs },
+
+		render: func(m *Model) string { return m.input.View().Content },
+		update: func(m *Model, msg tea.Msg) tea.Cmd {
+			updated, cmd := m.input.Update(msg)
+			m.input = updated.(inputUI.Model)
+			return cmd
+		},
+		isEditing: func(m *Model) bool { return m.input.IsEditing() },
+		resize:    func(m *Model, w, h int) { m.input.SetSize(w, h) },
+		activate:  func(m *Model) tea.Cmd { return m.input.Activate() },
 	},
 }
 

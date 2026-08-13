@@ -13,6 +13,7 @@ import (
 	audioUI "github.com/anotherhadi/settuings/internal/ui/audio"
 	bluetoothUI "github.com/anotherhadi/settuings/internal/ui/bluetooth"
 	notificationsUI "github.com/anotherhadi/settuings/internal/ui/components/notifications"
+	inputUI "github.com/anotherhadi/settuings/internal/ui/input"
 	networkUI "github.com/anotherhadi/settuings/internal/ui/network"
 	powerUI "github.com/anotherhadi/settuings/internal/ui/power"
 	"github.com/sirupsen/logrus"
@@ -45,6 +46,7 @@ type Model struct {
 	bluetooth     bluetoothUI.Model
 	audio         audioUI.Model
 	power         powerUI.Model
+	input         inputUI.Model
 	notifications notificationsUI.Model
 }
 
@@ -74,6 +76,7 @@ func New(initialPage string) (Model, error) {
 		bluetooth:     bluetoothUI.New(),
 		audio:         audioUI.New(),
 		power:         powerUI.New(),
+		input:         inputUI.New(),
 		notifications: notificationsUI.New(),
 		sidebarState:  sidebarState(cfg.TUI.DefaultSidebarState),
 		logPath:       logPath,
@@ -92,7 +95,7 @@ func New(initialPage string) (Model, error) {
 func (m Model) FatalErr() error { return m.fatalErr }
 
 func (m Model) Init() tea.Cmd {
-	cmds := []tea.Cmd{m.about.Init(), m.network.Init(), m.bluetooth.Init(), m.audio.Init(), m.power.Init()}
+	cmds := []tea.Cmd{m.about.Init(), m.network.Init(), m.bluetooth.Init(), m.audio.Init(), m.power.Init(), m.input.Init()}
 	if m.page != pageAbout {
 		cmds = append(cmds, m.activatePage(m.page))
 	}
