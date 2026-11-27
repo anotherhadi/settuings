@@ -296,6 +296,9 @@ func (p *NetBird) View(w, h int) string {
 		f.Right = strings.SplitN(p.d.state.IP, "/", 2)[0]
 		f.Detail = p.detailLines()
 	}
+	if p.on {
+		f.Right = "working…"
+	}
 	return p.list.Render(w, h, f)
 }
 

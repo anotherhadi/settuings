@@ -13,6 +13,7 @@ import (
 )
 
 var (
+	ErrTimeout      = errors.New("timed out: the device did not answer")
 	ErrNotFound     = errors.New("bluetoothctl not found in PATH")
 	ErrNoController = errors.New("no Bluetooth controller found")
 )
@@ -53,14 +54,22 @@ func run(timeout time.Duration, args ...string) (string, error) {
 		if errors.Is(err, exec.ErrNotFound) {
 			return "", ErrNotFound
 		}
-		msg := strings.TrimSpace(out)
+		if ctx.Err() != nil {
+			return "", ErrTimeout
+		}
+		msg := lastLine(out)
 		if msg == "" {
-			msg = strings.TrimSpace(stderr.String())
+			msg = lastLine(stderr.String())
 		}
 		if msg == "" {
 			msg = err.Error()
 		}
-		return "", fmt.Errorf("bluetoothctl %s: %s", strings.Join(args, " "), msg)
+		return "", errors.New(msg)
 	}
 	return out, nil
+}
+
+func lastLine(s string) string {
+	lines := strings.Split(strings.TrimSpace(s), "\n")
+	return strings.TrimSpace(lines[len(lines)-1])
 }

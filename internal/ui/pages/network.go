@@ -269,6 +269,12 @@ func (r netRow) active() bool {
 func (p *Network) askPassword(name string, submit func(string) tea.Cmd) tea.Cmd {
 	pr := prompt.New("Password · "+name, "", submit)
 	pr.Secret = true
+	pr.Validate = func(s string) error {
+		if s == "" {
+			return network.ErrEmptyPassword
+		}
+		return nil
+	}
 	return overlay.Open(pr)
 }
 
@@ -467,6 +473,9 @@ func (p *Network) View(w, h int) string {
 		f.Empty = "loading"
 	default:
 		f.Detail = p.detailLines()
+	}
+	if p.on {
+		f.Right = "working…"
 	}
 	return p.list.Render(w, h, f)
 }

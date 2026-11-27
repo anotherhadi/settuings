@@ -293,6 +293,9 @@ func (p *Audio) View(w, h int) string {
 	default:
 		f.Detail = p.detailLines()
 	}
+	if p.on {
+		f.Right = "working…"
+	}
 	return p.list.Render(w, h, f)
 }
 

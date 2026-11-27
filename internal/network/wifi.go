@@ -110,7 +110,12 @@ func ConnectKnown(name string) error {
 	return err
 }
 
+var ErrEmptyPassword = errors.New("a password is needed")
+
 func ConnectKnownWithSecret(name, password string) error {
+	if password == "" {
+		return ErrEmptyPassword
+	}
 	if _, err := run("connection", "modify", "id", name, "wifi-sec.psk-flags", "0", "wifi-sec.psk", password); err != nil {
 		return err
 	}

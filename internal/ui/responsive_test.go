@@ -19,6 +19,7 @@ import (
 
 func newModel(t *testing.T) *Model {
 	t.Helper()
+	isolate(t)
 	cfg, err := fconfig.LoadBytes[config.Config](foam.Defaults, config.Defaults)
 	if err != nil {
 		t.Fatal(err)

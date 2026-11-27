@@ -314,3 +314,21 @@ func TestConfigBoxShowsItsKeys(t *testing.T) {
 		t.Fatalf("remapped keys not shown:\n%s", v)
 	}
 }
+
+func TestWorkingIndicator(t *testing.T) {
+	p := NewPower()
+	p.d.profiles = []power.Profile{{Name: "balanced", Active: true}, {Name: "performance"}}
+	p.load = true
+	p.rebuild()
+	if strings.Contains(ansi.Strip(p.View(100, 20)), "working") {
+		t.Fatal("working while nothing runs")
+	}
+	p.use("performance")
+	if !strings.Contains(ansi.Strip(p.View(100, 20)), "working…") {
+		t.Fatal("no sign that the action is running")
+	}
+	p.Update(DoneMsg{Page: "power"})
+	if strings.Contains(ansi.Strip(p.View(100, 20)), "working") {
+		t.Fatal("still working after the action finished")
+	}
+}

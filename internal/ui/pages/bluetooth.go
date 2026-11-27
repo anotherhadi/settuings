@@ -235,6 +235,9 @@ func (p *Bluetooth) View(w, h int) string {
 		}
 		f.Detail = p.detailLines()
 	}
+	if p.on {
+		f.Right = "working…"
+	}
 	return p.list.Render(w, h, f)
 }
 

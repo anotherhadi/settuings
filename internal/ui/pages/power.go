@@ -197,6 +197,9 @@ func (p *Power) View(w, h int) string {
 			f.Right = map[bool]string{true: "plugged in", false: "on battery"}[p.d.ac.Online]
 		}
 	}
+	if p.on {
+		f.Right = "working…"
+	}
 	return p.list.Render(w, h, f)
 }
 

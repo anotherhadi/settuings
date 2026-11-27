@@ -70,7 +70,7 @@ func (p *About) text(w int) []string {
 	for _, f := range i.Fields {
 		keyW = max(keyW, ansi.StringWidth(f.Key))
 	}
-	keyW = min(keyW, max(w/3, 1))
+	keyW = min(keyW, max(w/2, 1))
 	valW := max(w-keyW-2, 1)
 	var out []string
 	if i.Title != "" {

@@ -411,6 +411,9 @@ func (p *Monitors) View(w, h int) string {
 		f.Right = "until sway reloads"
 		f.Detail = p.detailLines()
 	}
+	if p.on {
+		f.Right = "working…"
+	}
 	return p.list.Render(w, h, f)
 }
 
