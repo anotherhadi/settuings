@@ -1,0 +1,90 @@
+# settuings defaults: the reference for every setting.
+#
+# Do not copy this file: put only what you change in one of these (later wins):
+#
+#   ~/.config/foam/config.yaml          shared by every foam tool (theme, keys)
+#   ~/.config/settuings/config.yaml     settuings
+#   SETTUINGS_* environment variables   e.g. SETTUINGS_REFRESH=2
+#   command-line flags                  e.g. --page audio, -c refresh=2
+
+page: about             # page opened at launch
+pages: [about, network, bluetooth, audio, power, inputs, monitors, netbird]  # order of the tabs; one whose tool is missing is left out
+refresh: 5              # seconds between two refreshes of the page shown
+volumeStep: 5           # percent per key press
+speedStep: 0.1          # pointer speed per key press (-1 to 1)
+brightnessStep: 5       # percent per key press
+
+keys:
+  app:
+    quit: [q, ctrl+c]
+    help: "?"
+    palette: [":", ctrl+p]
+    refresh: r
+  page:
+    next: [tab, "]"]
+    prev: [shift+tab, "["]
+    about: "1"
+    network: "2"
+    bluetooth: "3"
+    audio: "4"
+    power: "5"
+    inputs: "6"
+    monitors: "7"
+    netbird: "8"
+  network:
+    connect: enter
+    disconnect: x
+    forget: d
+    autoconnect: a
+    secret: p
+    qrcode: Q
+    radio: w
+    info: i
+  bluetooth:
+    connect: enter
+    disconnect: x
+    trust: t
+    forget: d
+    scan: s
+    power: w
+    info: i
+  audio:
+    default: enter
+    mute: m
+    louder: [l, right, plus]
+    quieter: [h, left, "-"]
+    test: t
+    info: i
+  power:
+    set: enter
+    info: i
+  inputs:
+    faster: [l, right, plus]
+    slower: [h, left, "-"]
+    layouts: [enter, e]
+    info: i
+  monitors:
+    mode: enter
+    power: o
+    more: [l, right, plus]
+    less: [h, left, "-"]
+    rotate: t
+    place: p
+    sync: a
+    config: c
+    info: i
+  netbird:
+    select: enter
+    connect: c
+    disconnect: x
+    copy: y
+    info: i
+  choice:
+    close: [esc, q]
+    pick: enter
+    up: [k, up]
+    down: [j, down]
+  config:
+    copy: y
+    format: [tab, f]
+    close: [esc, q]
