@@ -120,10 +120,16 @@ func (p *Bluetooth) rebuild() {
 		}
 	}
 	var items []Item
-	if len(paired) > 0 {
-		items = append(items, Item{Header: true, Label: "Paired"})
-		items = append(items, paired...)
+	if p.load && p.d.err == nil {
+		items = append(items, Item{Header: true, Key: "hdr:power", Label: "Bluetooth", Badge: badge(p.d.ctl.Powered)})
+		switch {
+		case !p.d.ctl.Powered:
+			items = append(items, Item{Header: true, Dim: true, Label: "bluetooth is off"})
+		case len(paired)+len(nearby) == 0:
+			items = append(items, Item{Header: true, Dim: true, Label: "no device: scan with s"})
+		}
 	}
+	items = append(items, paired...)
 	if len(nearby) > 0 {
 		items = append(items, Item{Header: true, Label: "Nearby"})
 		items = append(items, nearby...)
@@ -189,10 +195,7 @@ func (p *Bluetooth) Commands() []commands.Command {
 			return overlay.Open(c)
 		}},
 		{ID: "bluetooth.scan", Title: "Scan for devices", Help: "scan", When: func() bool { return p.d.ctl.Powered }, Run: p.scan},
-		{ID: "bluetooth.power", Title: "Toggle the adapter", Help: "power", When: func() bool { return p.d.err == nil }, Run: func() tea.Cmd {
-			on := !p.d.ctl.Powered
-			return p.do(act("bluetooth", "Bluetooth "+onOff(on), func() error { return bluetooth.SetPower(on) }))
-		}},
+		{ID: "bluetooth.power", Title: "Toggle the adapter", Help: "power", When: func() bool { return p.d.err == nil }, Run: p.togglePower},
 		{ID: "bluetooth.info", Title: "Show the details", Help: "info", When: func() bool { return p.list.DetailHidden() && len(p.detailLines()) > 0 }, Run: func() tea.Cmd {
 			return openInfo("Bluetooth", p.detailLines())
 		}},
@@ -226,10 +229,8 @@ func (p *Bluetooth) View(w, h int) string {
 	case !p.load:
 		f.Empty = "loading"
 	case !p.d.ctl.Powered:
-		f.Empty = "bluetooth is off: w to power on"
-		f.Right = "off"
+		f.Empty = "bluetooth is off"
 	default:
-		f.Right = "on"
 		if p.scanning {
 			f.Right = "scanning"
 		}
@@ -241,7 +242,15 @@ func (p *Bluetooth) View(w, h int) string {
 	return p.list.Render(w, h, f)
 }
 
+func (p *Bluetooth) togglePower() tea.Cmd {
+	on := !p.d.ctl.Powered
+	return p.do(act("bluetooth", "Bluetooth "+onOff(on), func() error { return bluetooth.SetPower(on) }))
+}
+
 func (p *Bluetooth) Mouse(msg tea.MouseMsg) tea.Cmd {
+	if k, ok := p.list.BadgeClick(msg); ok && k == "hdr:power" {
+		return p.togglePower()
+	}
 	if p.list.Mouse(msg) {
 		if d, ok := p.dev(); ok && !d.Connected {
 			return p.connect()

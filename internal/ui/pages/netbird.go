@@ -89,7 +89,13 @@ func (p *NetBird) rebuild() {
 				others = append(others, it)
 			}
 		}
-		items = append(items, Item{Header: true, Label: "Exit nodes"})
+		hdr := Item{Header: true, Label: "Exit nodes"}
+		for _, n := range p.d.nets {
+			if n.Selected && n.ExitNode() {
+				hdr.Key, hdr.Badge = "hdr:exit", badge(true)
+			}
+		}
+		items = append(items, hdr)
 		if len(exits) == 0 {
 			items = append(items, Item{Header: true, Dim: true, Label: "no exit node available"})
 		}
@@ -302,7 +308,20 @@ func (p *NetBird) View(w, h int) string {
 	return p.list.Render(w, h, f)
 }
 
+func (p *NetBird) clearExit() tea.Cmd {
+	nets := append([]netbird.Network(nil), p.d.nets...)
+	for _, n := range nets {
+		if n.Selected && n.ExitNode() {
+			return p.do(act("netbird", "Stopped using "+n.ID, func() error { return netbird.Toggle(n.ID, nets) }))
+		}
+	}
+	return nil
+}
+
 func (p *NetBird) Mouse(msg tea.MouseMsg) tea.Cmd {
+	if k, ok := p.list.BadgeClick(msg); ok && k == "hdr:exit" {
+		return p.clearExit()
+	}
 	if p.list.Mouse(msg) {
 		return p.toggle()
 	}

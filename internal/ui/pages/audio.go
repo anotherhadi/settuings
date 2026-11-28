@@ -1,6 +1,7 @@
 package pages
 
 import (
+	"errors"
 	"fmt"
 
 	tea "charm.land/bubbletea/v2"
@@ -122,11 +123,10 @@ func (p *Audio) nextLevel() tea.Cmd {
 }
 
 func volNote(r audioRow) string {
-	switch {
-	case r.muted:
-		return theme.Warning().Render("muted")
-	}
 	s := theme.Subtle().Render(itoa(r.volume) + "%")
+	if r.muted {
+		s = theme.Warning().Render("muted")
+	}
 	if r.def {
 		s = theme.Success().Render("●") + " " + s
 	}
@@ -205,6 +205,44 @@ func (p *Audio) patch(r audioRow) {
 	p.rebuild()
 }
 
+func (p *Audio) muteAll() tea.Cmd {
+	mute := false
+	each := func(f func(id string, muted *bool)) {
+		for i := range p.d.sinks {
+			f(p.d.sinks[i].ID, &p.d.sinks[i].Muted)
+		}
+		for i := range p.d.sources {
+			f(p.d.sources[i].ID, &p.d.sources[i].Muted)
+		}
+		for i := range p.d.streams {
+			f(p.d.streams[i].ID, &p.d.streams[i].Muted)
+		}
+	}
+	each(func(_ string, m *bool) { mute = mute || !*m })
+	var ids []string
+	each(func(id string, m *bool) {
+		if *m != mute {
+			ids = append(ids, id)
+		}
+		*m = mute
+	})
+	p.rebuild()
+	if len(ids) == 0 {
+		return nil
+	}
+	msg := "Unmuted everything"
+	if mute {
+		msg = "Muted everything"
+	}
+	return act("audio", msg, func() error {
+		var errs []error
+		for _, id := range ids {
+			errs = append(errs, audio.SetMute(id, mute))
+		}
+		return errors.Join(errs...)
+	})
+}
+
 func (p *Audio) test() tea.Cmd {
 	r, ok := p.row()
 	if !ok {
@@ -245,6 +283,7 @@ func (p *Audio) Commands() []commands.Command {
 			p.patch(r)
 			return act("audio", "", func() error { return audio.SetMute(r.id, r.muted) })
 		}},
+		{ID: "audio.muteall", Title: "Mute or unmute everything", Help: "mute all", When: func() bool { return len(p.d.sinks)+len(p.d.sources)+len(p.d.streams) > 0 }, Run: p.muteAll},
 		{ID: "audio.louder", Title: "Volume up", Help: "volume", When: sel(func(audioRow) bool { return true }), Run: func() tea.Cmd { return p.setVolume(p.step) }},
 		{ID: "audio.quieter", Title: "Volume down", When: sel(func(audioRow) bool { return true }), Run: func() tea.Cmd { return p.setVolume(-p.step) }},
 		{ID: "audio.test", Title: "Test tone, or input level meter", Help: "test", When: sel(device), Run: p.test},

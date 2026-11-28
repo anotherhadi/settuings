@@ -20,6 +20,7 @@ type Item struct {
 	Icon   string
 	Label  string
 	Note   string
+	Badge  string // headers only: clickable badge on the right
 	Dim    bool
 	Data   any
 }
@@ -50,6 +51,15 @@ func (p *List) seek(i, dir int) int {
 	return -1
 }
 
+// pick selects row i; on the first selectable row it scrolls back to the very
+// top so the headers above it stay reachable.
+func (p *List) pick(i int) {
+	if i >= 0 && i == p.seek(0, 1) {
+		p.l.Select(0)
+	}
+	p.l.Select(i)
+}
+
 func (p *List) Set(items []Item) {
 	p.raw = items
 	p.layout()
@@ -78,15 +88,15 @@ func (p *List) layout() {
 	p.l.SetLen(len(items))
 	for i, it := range items {
 		if !it.Header && key != "" && it.Key == key {
-			p.l.Select(i)
+			p.pick(i)
 			return
 		}
 	}
 	i := min(prev, len(items)-1)
 	if j := p.seek(i, 1); j >= 0 {
-		p.l.Select(j)
+		p.pick(j)
 	} else if j := p.seek(i, -1); j >= 0 {
-		p.l.Select(j)
+		p.pick(j)
 	}
 }
 
@@ -115,7 +125,7 @@ func (p *List) move(target, dir int) {
 		}
 		target = j
 	}
-	p.l.Select(target)
+	p.pick(target)
 }
 
 func (p *List) Move(d int) {
@@ -161,10 +171,46 @@ func (p *List) Mouse(msg tea.MouseMsg) (activate bool) {
 			return false
 		}
 		before := p.l.Selected()
-		p.l.Select(i)
+		p.pick(i)
 		return i == before
 	}
 	return false
+}
+
+// BadgeClick returns the key of the header whose badge was left-clicked.
+func (p *List) BadgeClick(msg tea.MouseMsg) (string, bool) {
+	c, ok := msg.(tea.MouseClickMsg)
+	if !ok {
+		return "", false
+	}
+	mm := c.Mouse()
+	if mm.Button != tea.MouseLeft || !p.rows.Contains(mm.X, mm.Y) {
+		return "", false
+	}
+	start, end := p.l.Visible()
+	i := start + mm.Y - p.rows.Y
+	if i < start || i >= end || !p.items[i].Header || p.items[i].Badge == "" {
+		return "", false
+	}
+	bw := ansi.StringWidth(p.items[i].Badge)
+	if mm.X < p.rows.X+p.rows.W-1-bw || mm.X >= p.rows.X+p.rows.W-1 {
+		return "", false
+	}
+	return p.items[i].Key, true
+}
+
+// badge renders a rounded on/off pill.
+func badge(on bool) string {
+	c, txt := theme.Muted(), "off"
+	if on {
+		c, txt = theme.Success(), "on"
+	}
+	if !theme.NerdFonts() {
+		return c.Render("[" + txt + "]")
+	}
+	edge := c.Style()
+	body := lipgloss.NewStyle().Background(c.Value()).Foreground(theme.Bg().Value()).Bold(true)
+	return edge.Render("\ue0b6") + body.Render(txt) + edge.Render("\ue0b4")
 }
 
 func (p *List) hidden(start, end int) string {
@@ -191,6 +237,12 @@ func (p *List) row(it Item, w int) string {
 		st := theme.Accent().Style().Bold(true)
 		if it.Dim {
 			st = theme.Subtle().Style()
+		}
+		if it.Badge != "" {
+			bw := ansi.StringWidth(it.Badge)
+			label := ansi.Truncate(it.Label, max(w-bw-3, 0), "…")
+			gap := max(w-1-ansi.StringWidth(label)-bw-1, 0)
+			return " " + st.Render(label) + strings.Repeat(" ", gap) + it.Badge + " "
 		}
 		return " " + st.Render(ansi.Truncate(it.Label, max(w-2, 0), "…"))
 	}

@@ -176,7 +176,7 @@ func (p *Network) rebuild() {
 	d := p.d
 	var items []Item
 	if d.hasWifi {
-		items = append(items, Item{Header: true, Label: "Wi-Fi"})
+		items = append(items, Item{Header: true, Key: "hdr:wifi", Label: "Wi-Fi", Badge: badge(d.radio)})
 		switch {
 		case !d.radio:
 			items = append(items, Item{Header: true, Dim: true, Label: "Wi-Fi is off"})
@@ -388,10 +388,7 @@ func (p *Network) Commands() []commands.Command {
 		{ID: "network.autoconnect", Title: "Toggle auto-connect", When: sel(saved), Run: p.autoconnect},
 		{ID: "network.secret", Title: "Show the saved password", When: sel(saved), Run: p.secret},
 		{ID: "network.qrcode", Title: "Share the network with a QR code", Help: "qr", When: sel(saved), Run: p.qrcode},
-		{ID: "network.radio", Title: "Toggle the Wi-Fi radio", Help: "radio", When: func() bool { return p.d.hasWifi }, Run: func() tea.Cmd {
-			on := !p.d.radio
-			return p.do(act("network", "Wi-Fi "+onOff(on), func() error { return network.SetWifiRadio(on) }))
-		}},
+		{ID: "network.radio", Title: "Toggle the Wi-Fi radio", Help: "radio", When: func() bool { return p.d.hasWifi }, Run: p.toggleRadio},
 		{ID: "network.info", Title: "Show the details", Help: "info", When: func() bool { return p.list.DetailHidden() && len(p.detailLines()) > 0 }, Run: func() tea.Cmd {
 			return openInfo("Network", p.detailLines())
 		}},
@@ -462,10 +459,7 @@ func (p *Network) detailLines() []string {
 }
 
 func (p *Network) View(w, h int) string {
-	f := Frame{Title: icon("\U000f05a9 ", "") + "Network", Right: "", DetailTitle: "Details", Empty: "no network device"}
-	if p.d.hasWifi {
-		f.Right = "Wi-Fi " + onOff(p.d.radio)
-	}
+	f := Frame{Title: icon("\U000f05a9 ", "") + "Network", DetailTitle: "Details", Empty: "no network device"}
 	switch {
 	case p.d.err != nil:
 		f.Empty = p.d.err.Error()
@@ -480,7 +474,15 @@ func (p *Network) View(w, h int) string {
 	return p.list.Render(w, h, f)
 }
 
+func (p *Network) toggleRadio() tea.Cmd {
+	on := !p.d.radio
+	return p.do(act("network", "Wi-Fi "+onOff(on), func() error { return network.SetWifiRadio(on) }))
+}
+
 func (p *Network) Mouse(msg tea.MouseMsg) tea.Cmd {
+	if k, ok := p.list.BadgeClick(msg); ok && k == "hdr:wifi" {
+		return p.toggleRadio()
+	}
 	if p.list.Mouse(msg) {
 		if r, ok := p.row(); ok && !r.active() {
 			return p.connect()

@@ -51,6 +51,7 @@ keys:
   audio:
     default: enter
     mute: m
+    muteall: M
     louder: [l, right, plus]
     quieter: [h, left, "-"]
     test: t
